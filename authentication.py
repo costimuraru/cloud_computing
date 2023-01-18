@@ -4,14 +4,17 @@ from .models import User, map_user_db_to_domain
 from werkzeug.security import check_password_hash, generate_password_hash
 from blog.__init__ import users_collection
 import uuid
+import requests
+
 
 
 
 authentication = Blueprint('authentication', __name__)
 
 @authentication.route('/2fa', methods=['GET', 'POST'])
-def twofa():
+def two_fa():
     return render_template("2fa.html", user=current_user)
+
 
 @authentication.route('/user-login', methods=['GET', 'POST'])
 def login():
@@ -22,17 +25,23 @@ def login():
         password = request.form.get('password')
         user_data = users_collection.find_one({'email': email})
         if user_data and check_password_hash(user_data['password'], password):
+            #two_fa_API()
+            r = requests.post('http://127.0.0.1:5050', data = {'email': email} )
             return render_template("2fa.html", user=current_user)
             if request.form['sms_code'] == user_data['sms_code']:
                 flash('You have been logged in successfully!', category='success')
                 user = map_user_db_to_domain(user_data)
                 login_user(user, remember=True)
                 return redirect(url_for('pages.home'))
-        else:flash('The verification code you have entered is incorrect', category='error')
-    else:
+            else:flash('The verification code you have entered is incorrect', category='error')
+        else:
             flash('Your username or password is incorrect, please try again.', category='error')
 
     return render_template("user-login.html", user=current_user)
+
+
+#def two_fa_API():
+    
 
 
 @authentication.route('/logout')
