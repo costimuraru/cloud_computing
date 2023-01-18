@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Two factor authentication code{% endblock %}
+
+{% block content%}
+
+    <form method="POST">
+      <h3 align="center">Please enter the sms code you received</h3>
+      </div>
+      <div class="form-group">
+        <label for="sms_code">sms code</label>
+        <input
+          type="sms_code"
+          class="form-control"
+          id="sms_code"
+          name="sms_code"
+          placeholder="Enter sms_code"
+        />
+      </div>
+      <br />
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+{% endblock %}

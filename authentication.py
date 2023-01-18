@@ -9,6 +9,9 @@ import uuid
 
 authentication = Blueprint('authentication', __name__)
 
+@authentication.route('/2fa', methods=['GET', 'POST'])
+def twofa():
+    return render_template("2fa.html", user=current_user)
 
 @authentication.route('/user-login', methods=['GET', 'POST'])
 def login():
@@ -19,14 +22,18 @@ def login():
         password = request.form.get('password')
         user_data = users_collection.find_one({'email': email})
         if user_data and check_password_hash(user_data['password'], password):
-            flash('You have been logged in successfully!', category='success')
-            user = map_user_db_to_domain(user_data)
-            login_user(user, remember=True)
-            return redirect(url_for('pages.home'))
-        else:
+            return render_template("2fa.html", user=current_user)
+            if request.form['sms_code'] == user_data['sms_code']:
+                flash('You have been logged in successfully!', category='success')
+                user = map_user_db_to_domain(user_data)
+                login_user(user, remember=True)
+                return redirect(url_for('pages.home'))
+        else:flash('The verification code you have entered is incorrect', category='error')
+    else:
             flash('Your username or password is incorrect, please try again.', category='error')
 
     return render_template("user-login.html", user=current_user)
+
 
 @authentication.route('/logout')
 @login_required
@@ -57,7 +64,7 @@ def sign_up():
         else:
             flash('Your account was created!', category='success')
             hashed_password = generate_password_hash(password1)
-            users_collection.insert({'_id': uuid.uuid4().hex, 'password': hashed_password, 'email': email, 'first_name': first_name, 'phone_number': phone_number, 'notes': None})
+            users_collection.insert({'_id': uuid.uuid4().hex, 'password': hashed_password, 'email': email, 'first_name': first_name, 'phone_number': phone_number, 'notes': None, 'sms_code': None})
             return redirect(url_for('pages.home'))
 
     return render_template("signup.html", user=current_user)
