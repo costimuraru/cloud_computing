@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+  api:
+    build: .
+    depends_on:
+      - mongo
+    links:
+      - "mongo:mymongo.com" # connect to the mongo container via the custom DNS: mymongo.com
+    ports:
+      - "8000:8000"

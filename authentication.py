@@ -73,7 +73,7 @@ def sign_up():
         else:
             flash('Your account was created!', category='success')
             hashed_password = generate_password_hash(password1)
-            users_collection.insert({'_id': uuid.uuid4().hex, 'password': hashed_password, 'email': email, 'first_name': first_name, 'phone_number': phone_number, 'notes': None, 'sms_code': None})
+            users_collection.insert_one({'_id': uuid.uuid4().hex, 'password': hashed_password, 'email': email, 'first_name': first_name, 'phone_number': phone_number, 'notes': None, 'sms_code': None})
             return redirect(url_for('pages.home'))
 
     return render_template("signup.html", user=current_user)

@@ -4,7 +4,7 @@ from .models import User, map_user_db_to_domain
 import pymongo
 
 
-client = pymongo.MongoClient('localhost', 27017)
+client = pymongo.MongoClient('mymongo.com', 27017)
 db = client['Mongo']
 users_collection = db['users']
 
